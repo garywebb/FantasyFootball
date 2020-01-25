@@ -12,12 +12,12 @@ namespace ScoreScraper
 {
     public static class ScoreScraper
     {
-        [FunctionName("ScoreScraperFunc")]
+        [FunctionName("ScoreScraper")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest request,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request. Try redeploy");
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
             string name = request.Query["name"];
 
