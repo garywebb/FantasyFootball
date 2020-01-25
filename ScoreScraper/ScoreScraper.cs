@@ -12,7 +12,7 @@ namespace ScoreScraper
 {
     public static class ScoreScraper
     {
-        [FunctionName("ScoreScraper")]
+        [FunctionName("ScoreScraperFunc")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest request,
             ILogger log)
