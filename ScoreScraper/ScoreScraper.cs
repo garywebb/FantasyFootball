@@ -14,9 +14,10 @@ namespace ScoreScraper
     public static class ScoreScraper
     {
         [FunctionName("ScoreScraper")]
-        public static async Task<IActionResult> Run(
+        [return: Blob("player-data")]
+        public static async Task<string> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest request,
-            [Queue("playerDataQueue"), StorageAccount("AzureWebJobsStorage")] ICollector<string> msg,
+            //[Microsoft.Azure.WebJobs.Queue("playerDataQueue"), StorageAccount("AzureWebJobsStorage")] ICollector<string> msg,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -27,14 +28,16 @@ namespace ScoreScraper
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
 
-            if (!String.IsNullOrEmpty(name))
-            {
-                msg.Add($"Name passed to the function: {name}");
-            }
+            return $"Hello, {name}";
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            //if (!String.IsNullOrEmpty(name))
+            //{
+            //    msg.Add($"Name passed to the function: {name}");
+            //}
+
+            //return name != null
+            //    ? (ActionResult)new OkObjectResult($"Hello, {name}")
+            //    : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }
     }
 }
