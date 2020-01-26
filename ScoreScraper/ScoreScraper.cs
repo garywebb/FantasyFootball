@@ -14,7 +14,7 @@ namespace ScoreScraper
     public static class ScoreScraper
     {
         [FunctionName("ScoreScraper")]
-        [return: Blob("player-data")]
+        [return: Blob("player-data/scores")]
         public static async Task<string> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest request,
             //[Microsoft.Azure.WebJobs.Queue("playerDataQueue"), StorageAccount("AzureWebJobsStorage")] ICollector<string> msg,
