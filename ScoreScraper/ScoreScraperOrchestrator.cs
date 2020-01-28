@@ -15,7 +15,7 @@ namespace ScoreScraper
             [OrchestrationTrigger] DurableOrchestrationContext context,
             [Blob("player-data/scores", FileAccess.Write)] Stream output)
         {
-            var result = await context.WaitForExternalEvent<string>("ScoreScraperOrchestrator_Hello");
+            var result = await context.CallActivityAsync<string>("ScoreScraperOrchestrator_Hello", null);
             using (var streamWriter = new StreamWriter(output))
             {
                 await streamWriter.WriteAsync(result);
@@ -25,7 +25,7 @@ namespace ScoreScraper
         }
 
         [FunctionName("ScoreScraperOrchestrator_Hello")]
-        public static string SayHello(ILogger log)
+        public static string SayHello([ActivityTrigger] object _, ILogger log)
         {
             log.LogInformation($"Saying hello to Gary.");
             return $"Hello Gary from durable function!";
