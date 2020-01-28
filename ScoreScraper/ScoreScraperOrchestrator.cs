@@ -19,6 +19,8 @@ namespace ScoreScraper
             using (var streamWriter = new StreamWriter(output))
             {
                 await streamWriter.WriteAsync(result);
+                await streamWriter.FlushAsync();
+                output.Position = 0;
             }
         }
 
