@@ -8,16 +8,18 @@ using Microsoft.Azure.WebJobs.Extensions.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace ScoreScraper
 {
     public static class ScoreScraper
     {
         [FunctionName("ScoreScraper")]
-        [return: Blob("player-data/scores")]
-        public static async Task<string> Run(
+        //[return: Blob("player-data/scores")]
+        public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest request,
-            //[Microsoft.Azure.WebJobs.Queue("playerDataQueue"), StorageAccount("AzureWebJobsStorage")] ICollector<string> msg,
+            //[Queue("playerDataQueue"), StorageAccount("AzureWebJobsStorage")] ICollector<string> msg,
+            [Blob("player-data/scores", FileAccess.Write)] Stream output,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -28,16 +30,29 @@ namespace ScoreScraper
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
 
-            return $"Hello, {name}";
+            using (var httpClient = new HttpClient())
+            {
+                var baseUri = "http://localhost:7071/api";
+                using (var result = await httpClient.GetAsync($"{baseUri}/ScoreScraperFantasyPremierLeague?name={name}"))
+                {
+                    using (var content = result.Content)
+                    {
+                        var input = await content.ReadAsStreamAsync();
+                        await input.CopyToAsync(output);
+                    }
+                }
+            }
+
+            //return $"Hello, {name}";
 
             //if (!String.IsNullOrEmpty(name))
             //{
             //    msg.Add($"Name passed to the function: {name}");
             //}
 
-            //return name != null
-            //    ? (ActionResult)new OkObjectResult($"Hello, {name}")
-            //    : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return name != null
+                ? (ActionResult)new OkObjectResult($"Hello, {name}")
+                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }
     }
 }
